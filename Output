@@ -1,0 +1,131 @@
+#Several options for producing file output below
+#not tried yet
+
+JAVA
+################################################################
+
+package igpfileoutput;
+import java.io.PrintWriter;
+import javax.xml.ws.Response;
+//use printwriter to generate csv file
+public class igpfileoutput {
+	PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("igp.csv")));
+
+		while(rs.next()) {
+			System.out.println(String.format("%s,%s,%s",rs.getString(1),rs.getString(2),rs.getString(3));
+		}
+}}
+
+//CSV files
+@GET
+@Path("/events.csv")
+public Response getEventsAsCsv(@Context HttpServletResponse response) throws Throwable {
+    DataReader reader = getEvents();
+
+    response.setContentType("text/csv");
+    response.setHeader("Content-Disposition", "attachment; filename=\"events.csv\"");
+    PrintWriter printWriter = response.getWriter();
+    DataWriter writer = new CSVWriter(printWriter).setFieldNamesInFirstRow(true);
+
+    JobTemplate.DEFAULT.transfer(reader, writer);
+
+    return Response.ok().build();
+}
+
+//Excel files
+@GET
+@Path("/events.excel")
+public Response getEventsAsExcel(@Context HttpServletResponse response) throws Throwable {
+    DataReader reader = getEvents();
+
+    ExcelDocument excelDocument = new ExcelDocument();
+    DataWriter writer = new ExcelWriter(excelDocument).setFieldNamesInFirstRow(true);
+
+    JobTemplate.DEFAULT.transfer(reader, writer);
+
+    response.setContentType("application/vnd.ms-excel");
+    response.setHeader("Content-Disposition", "attachment; filename=\"events.xls\"");
+    OutputStream outputStream = response.getOutputStream();
+    excelDocument.save(outputStream);
+
+    return Response.ok().build();
+}
+
+
+PERL
+#######################################################################################
+#!/usr/bin/perl
+
+use warnings;
+
+use strict;
+
+use Spreadsheet::WriteExcel;
+
+
+
+
+##The following allows you to create a new Excel spreadsheet/workbook using perl
+
+# Create a new Excel workbook
+
+
+my $workbook = Spreadsheet::WriteExcel->new('perl.xls');
+
+
+# Add a worksheet
+my $worksheet = $workbook->add_worksheet();
+
+
+# Add and define a format
+
+my $format = $workbook->add_format(); 
+# Add a format
+
+$format->set_bold();
+
+$format->set_color('red');
+
+$format->set_align('center');
+
+
+# Write a formatted and unformatted string, row and column notation.
+
+my $col;
+
+my $row;
+
+$col = $row = 0;
+
+$worksheet->write($row, $col, 'Test', $format);
+
+$worksheet->write(1,    $col, 'Test');
+
+
+# Write a number and a formula using A1 notation
+$worksheet->write('A3', 1.2345);
+
+$worksheet->write('A4', '=SIN(PI()/4)');
+
+
+
+################################################
+   
+#how to save an excel spreadsheet from a perl cgi script
+
+
+#Assuming we have our raw binary Excel sheet in a variable called $excel,
+
+#we can use this simple block of code to allow it to be downloaded from a
+
+#web script with the filename of text.xls.
+#
+my $excel;    
+
+print "content-type: application/vnd.ms-excel\n";
+
+print "content-disposition: attachment; 
+filename=perl.xls\n\n";
+
+print $excel;
+
